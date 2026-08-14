@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giochiamo con la Tastiera!</title>
+<style>
+  :root{
+    --rosa:#ff6b9d; --giallo:#ffd93d; --verde:#6bcB77; --blu:#4d96ff;
+    --viola:#9b5de5; --arancio:#ff9f45; --scuro:#2b2d42; --chiaro:#fffdf7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:"Comic Sans MS","Chalkboard SE","Trebuchet MS",system-ui,sans-serif;
+    background:linear-gradient(160deg,#a8e6ff 0%,#c9f7d4 45%,#fff5c2 100%);
+    color:var(--scuro);
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:manipulation;
+  }
+  #app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .schermo{display:none;position:absolute;inset:0;}
+  .schermo.attivo{display:block;}
+
+  /* ---------- MENU ---------- */
+  #menu{display:none;flex-direction:column;align-items:center;justify-content:center;padding:2vh 2vw;gap:2vh;}
+  #menu.attivo{display:flex;}
+  h1{
+    font-size:clamp(28px,6vw,64px);
+    color:var(--viola);
+    text-shadow:3px 3px 0 #fff, 6px 6px 0 rgba(0,0,0,.08);
+    text-align:center;
+  }
+  .sottotitolo{font-size:clamp(14px,2.2vw,22px);opacity:.75;text-align:center;}
+  .carte{display:flex;flex-wrap:wrap;gap:2vh 2vw;justify-content:center;max-width:1000px;}
+  .carta{
+    width:clamp(200px,22vw,260px);
+    background:#fff;
+    border:6px solid var(--giallo);
+    border-radius:28px;
+    padding:18px 14px;
+    text-align:center;
+    cursor:pointer;
+    box-shadow:0 10px 0 rgba(0,0,0,.12);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .carta:hover,.carta:focus{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 0 rgba(0,0,0,.14);outline:none;}
+  .carta .icona{font-size:clamp(44px,7vw,72px);display:block;line-height:1.1;}
+  .carta .nome{font-size:clamp(18px,2.4vw,26px);font-weight:bold;margin-top:6px;}
+  .carta .numero{
+    display:inline-block;margin-top:10px;background:var(--blu);color:#fff;
+    border-radius:999px;padding:4px 16px;font-size:clamp(14px,1.8vw,18px);
+  }
+  .carta:nth-child(2){border-color:var(--verde);}
+  .carta:nth-child(3){border-color:var(--rosa);}
+  .carta:nth-child(4){border-color:var(--blu);}
+  .carta:nth-child(5){border-color:var(--arancio);}
+
+  /* ---------- BARRE ---------- */
+  .barra-alto{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 18px;font-size:clamp(16px,2.2vw,24px);
+    pointer-events:none;z-index:5;
+  }
+  .stelle{font-size:clamp(20px,3vw,32px);letter-spacing:2px;}
+  .pillola{
+    background:rgba(255,255,255,.85);border-radius:999px;padding:6px 18px;
+    box-shadow:0 4px 0 rgba(0,0,0,.08);
+  }
+  .barra-basso{
+    position:absolute;bottom:0;left:0;right:0;text-align:center;
+    padding:10px;font-size:clamp(12px,1.6vw,16px);opacity:.6;z-index:5;
+  }
+
+  /* ---------- GIOCO LETTERE / NUMERI ---------- */
+  .centro{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1vh;padding:8vh 4vw;
+  }
+  #lettera-grande{
+    font-size:clamp(120px,30vh,340px);
+    font-weight:bold;color:var(--viola);
+    text-shadow:6px 6px 0 #fff, 12px 12px 0 rgba(0,0,0,.08);
+    line-height:1;
+  }
+  #lettera-parola{font-size:clamp(24px,4vw,48px);}
+  #lettera-emoji{font-size:clamp(50px,10vh,110px);}
+  .scossa{animation:scossa .4s;}
+  @keyframes scossa{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-14px) rotate(-3deg)}
+    40%{transform:translateX(14px) rotate(3deg)}
+    60%{transform:translateX(-10px) rotate(-2deg)}
+    80%{transform:translateX(10px) rotate(2deg)}
+  }
+  .salta{animation:salta .5s;}
+  @keyframes salta{
+    0%{transform:scale(1)} 40%{transform:scale(1.35) rotate(6deg)} 100%{transform:scale(1)}
+  }
+  #conta-oggetti{
+    display:flex;flex-wrap:wrap;gap:2vh 3vw;justify-content:center;align-items:center;
+    max-width:80vw;font-size:clamp(40px,11vh,110px);
+  }
+  #conta-oggetti span{animation:salta .5s;}
+  .aiuto{font-size:clamp(16px,2.4vw,28px);opacity:.7;text-align:center;}
+
+  /* ---------- GIOCO FRUTTA ---------- */
+  #campo{position:absolute;inset:0;overflow:hidden;}
+  .attore{position:absolute;font-size:64px;line-height:1;will-change:transform;}
+  #eroe{font-size:76px;z-index:3;transition:none;}
+  .frutto{z-index:2;animation:ondeggia 2s ease-in-out infinite;}
+  @keyframes ondeggia{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  /* ---------- TASTI MAGICI ---------- */
+  .bolla{
+    position:absolute;font-size:110px;line-height:1;pointer-events:none;
+    animation:bolla 1.6s ease-out forwards;z-index:2;
+  }
+  @keyframes bolla{
+    0%{transform:scale(.2) rotate(0deg);opacity:0}
+    25%{transform:scale(1.2) rotate(10deg);opacity:1}
+    100%{transform:scale(1.6) translateY(-160px) rotate(-12deg);opacity:0}
+  }
+
+  /* ---------- CORRI E SALTA ---------- */
+  #pista{position:absolute;inset:0;overflow:hidden;}
+  #terreno{
+    position:absolute;left:0;right:0;bottom:0;height:22%;
+    background:linear-gradient(180deg,#8ed86f 0%,#63b74a 100%);
+    border-top:8px dashed rgba(255,255,255,.6);
+    z-index:1;
+  }
+  #corridore{
+    position:absolute;font-size:78px;line-height:1;z-index:4;will-change:transform;
+  }
+  .stellina{position:absolute;font-size:56px;line-height:1;z-index:3;will-change:transform;}
+  .nuvoletta{position:absolute;font-size:60px;line-height:1;z-index:2;opacity:.9;}
+  #corri-via{
+    position:absolute;top:16%;left:0;right:0;text-align:center;
+    font-size:clamp(16px,2.6vw,30px);z-index:5;pointer-events:none;opacity:.85;
+  }
+
+  /* ---------- CORIANDOLI ---------- */
+  .coriandolo{
+    position:absolute;width:14px;height:22px;border-radius:4px;
+    pointer-events:none;z-index:10;animation:cade 1.6s linear forwards;
+  }
+  @keyframes cade{
+    0%{transform:translateY(0) rotate(0deg);opacity:1}
+    100%{transform:translateY(90vh) rotate(720deg);opacity:0}
+  }
+
+  /* ---------- PREMIO ---------- */
+  #premio{
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    flex-direction:column;gap:2vh;background:rgba(255,255,255,.75);z-index:20;text-align:center;padding:4vw;
+  }
+  #premio.attivo{display:flex;}
+  #premio .grande{font-size:clamp(80px,20vh,200px);animation:salta 1s infinite;}
+  #premio .testo{font-size:clamp(26px,5vw,56px);color:var(--verde);font-weight:bold;}
+  #premio .piccolo{font-size:clamp(14px,2vw,22px);opacity:.7;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= MENU ================= -->
+  <section id="menu" class="schermo attivo">
+    <h1>🎈 Giochiamo con la Tastiera! 🎈</h1>
+    <p class="sottotitolo">Premi un numero sulla tastiera oppure tocca una carta</p>
+    <div class="carte">
+      <div class="carta" data-gioco="lettere" tabindex="0">
+        <span class="icona">🔤</span>
+        <div class="nome">Le Lettere</div>
+        <span class="numero">premi 1</span>
+      </div>
+      <div class="carta" data-gioco="frutta" tabindex="0">
+        <span class="icona">🍓</span>
+        <div class="nome">Raccogli la Frutta</div>
+        <span class="numero">premi 2</span>
+      </div>
+      <div class="carta" data-gioco="conta" tabindex="0">
+        <span class="icona">🔢</span>
+        <div class="nome">Conta con Me</div>
+        <span class="numero">premi 3</span>
+      </div>
+      <div class="carta" data-gioco="magici" tabindex="0">
+        <span class="icona">✨</span>
+        <div class="nome">Tasti Magici</div>
+        <span class="numero">premi 4</span>
+      </div>
+      <div class="carta" data-gioco="corri" tabindex="0">
+        <span class="icona">🏃⭐</span>
+        <div class="nome">Corri e Salta</div>
+        <span class="numero">premi 5</span>
+      </div>
+    </div>
+    <p class="sottotitolo">🔊 <b>M</b> = suoni on/off &nbsp;·&nbsp; 🗣️ <b>V</b> = voce on/off &nbsp;·&nbsp; <b>ESC</b> = torna qui</p>
+  </section>
+
+  <!-- ================= LETTERE ================= -->
+  <section id="gioco-lettere" class="schermo">
+    <div class="barra-alto">
+      <span class="pillola">🏠 ESC</span>
+      <span class="pillola stelle" data-stelle></span>
+    </div>
+    <div class="centro">
+      <div id="lettera-grande">A</div>
+      <div id="lettera-emoji">🐝</div>
+      <div id="lettera-parola">A come Ape</div>
+      <div class="aiuto">Trova questa lettera sulla tastiera!</div>
+    </div>
+    <div class="barra-basso">Ogni tasto sbagliato va benissimo: si riprova senza fretta 💛</div>
+  </section>
+
+  <!-- ================= FRUTTA ================= -->
+  <section id="gioco-frutta" class="schermo">
+    <div class="barra-alto">
+      <span class="pillola">🏠 ESC</span>
+      <span class="pillola stelle" data-stelle></span>
+    </div>
+    <div id="campo">
+      <div id="eroe" class="attore">🐻</div>
+    </div>
+    <div class="barra-basso">Usa le <b>frecce ⬅️ ⬆️ ⬇️ ➡️</b> per raccogliere la frutta</div>
+  </section>
+
+  <!-- ================= CONTA ================= -->
+  <section id="gioco-conta" class="schermo">
+    <div class="barra-alto">
+      <span class="pillola">🏠 ESC</span>
+      <span class="pillola stelle" data-stelle></span>
+    </div>
+    <div class="centro">
+      <div id="conta-oggetti"></div>
+      <div class="aiuto">Quanti sono? Premi il numero giusto!</div>
+    </div>
+    <div class="barra-basso">Contiamo insieme ad alta voce 🖐️</div>
+  </section>
+
+  <!-- ================= TASTI MAGICI ================= -->
+  <section id="gioco-magici" class="schermo">
+    <div class="barra-alto">
+      <span class="pillola">🏠 ESC</span>
+      <span class="pillola stelle" data-stelle></span>
+    </div>
+    <div class="centro">
+      <div class="aiuto" id="magici-aiuto" style="font-size:clamp(22px,4vw,44px)">
+        ✨ Premi un tasto qualsiasi! ✨
+      </div>
+    </div>
+    <div class="barra-basso">Qui non si può sbagliare: ogni tasto fa una magia</div>
+  </section>
+
+  <!-- ================= CORRI E SALTA ================= -->
+  <section id="gioco-corri" class="schermo">
+    <div class="barra-alto">
+      <span class="pillola">🏠 ESC</span>
+      <span class="pillola stelle" data-stelle></span>
+    </div>
+    <div id="pista">
+      <div id="corri-via">Salta con lo <b>SPAZIO</b> per prendere le stelline! ⭐</div>
+      <div id="terreno"></div>
+      <div id="corridore">🏃</div>
+    </div>
+    <div class="barra-basso">Premi <b>SPAZIO</b> o <b>⬆️</b> per saltare</div>
+  </section>
+
+  <!-- ================= PREMIO ================= -->
+  <div id="premio">
+    <div class="grande">🏆</div>
+    <div class="testo">BRAVISSIMO!</div>
+    <div class="piccolo">Premi un tasto per continuare a giocare</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ========== STATO ========== */
+  var stato = {
+    gioco: "menu",
+    stelle: 0,
+    suoni: true,
+    voce: true,
+    bersaglio: null,   // lettera o numero da premere
+    tastiPremuti: {},
+    animazione: null,
+    frutti: [],
+    eroe: {x:0, y:0},
+    inPremio: false
+  };
+  var STELLE_PER_PREMIO = 5;
+
+  /* ========== AUDIO ========== */
+  var ac = null;
+  function audio(){
+    if(!ac){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return null;
+      ac = new AC();
+    }
+    if(ac.state === "suspended") ac.resume();
+    return ac;
+  }
+  function nota(freq, durata, tipo, volume, ritardo){
+    if(!stato.suoni) return;
+    var c = audio(); if(!c) return;
+    durata = durata || 0.22; tipo = tipo || "sine";
+    volume = (volume === undefined) ? 0.18 : volume; ritardo = ritardo || 0;
+    var t = c.currentTime + ritardo;
+    var osc = c.createOscillator(), gain = c.createGain();
+    osc.type = tipo; osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(volume, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + durata);
+    osc.connect(gain); gain.connect(c.destination);
+    osc.start(t); osc.stop(t + durata + 0.05);
+  }
+  function suonoOk(){ [523,659,784,1047].forEach(function(f,i){ nota(f,0.18,"triangle",0.18,i*0.08); }); }
+  function suonoPremio(){ [523,587,659,698,784,880,1047].forEach(function(f,i){ nota(f,0.25,"triangle",0.2,i*0.1); }); }
+  function suonoRiprova(){ nota(240,0.16,"sine",0.10); nota(200,0.18,"sine",0.10,0.12); }
+  function suonoPop(){ nota(400 + Math.random()*700, 0.16, "square", 0.12); }
+
+  /* ========== VOCE ========== */
+  function parla(testo){
+    if(!stato.voce || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(testo);
+      u.lang = "it-IT"; u.rate = 0.85; u.pitch = 1.25;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  /* ========== UTILITÀ ========== */
+  function $(sel){ return document.querySelector(sel); }
+  function a_caso(lista){ return lista[Math.floor(Math.random()*lista.length)]; }
+  function tra(min,max){ return min + Math.random()*(max-min); }
+
+  function coriandoli(quanti){
+    var colori = ["#ff6b9d","#ffd93d","#6bcB77","#4d96ff","#9b5de5","#ff9f45"];
+    for(var i=0;i<(quanti||40);i++){
+      var c = document.createElement("div");
+      c.className = "coriandolo";
+      c.style.background = a_caso(colori);
+      c.style.left = tra(0,100) + "vw";
+      c.style.top = "-30px";
+      c.style.animationDelay = (Math.random()*0.4) + "s";
+      document.body.appendChild(c);
+      (function(el){ setTimeout(function(){ el.remove(); }, 2400); })(c);
+    }
+  }
+
+  function aggiornaStelle(){
+    var testo = "";
+    for(var i=0;i<STELLE_PER_PREMIO;i++) testo += (i < stato.stelle ? "⭐" : "☆");
+    var barre = document.querySelectorAll("[data-stelle]");
+    for(var j=0;j<barre.length;j++) barre[j].textContent = testo;
+  }
+
+  function stellaVinta(){
+    stato.stelle++;
+    aggiornaStelle();
+    if(stato.stelle >= STELLE_PER_PREMIO){
+      mostraPremio();
+      return true;
+    }
+    return false;
+  }
+
+  var FRASI_BRAVO = ["Bravissimo!","Che bravo!","Evviva!","Perfetto!","Fantastico!","Grande!"];
+  function mostraPremio(){
+    stato.inPremio = true;
+    stato.stelle = 0;
+    aggiornaStelle();
+    $("#premio").classList.add("attivo");
+    coriandoli(90);
+    suonoPremio();
+    parla("Bravissimo! Hai vinto la coppa!");
+  }
+  function chiudiPremio(){
+    stato.inPremio = false;
+    $("#premio").classList.remove("attivo");
+  }
+
+  /* ========== NAVIGAZIONE SCHERMI ========== */
+  function mostra(id){
+    var schermi = document.querySelectorAll(".schermo");
+    for(var i=0;i<schermi.length;i++) schermi[i].classList.remove("attivo");
+    $(id).classList.add("attivo");
+  }
+
+  function vaiAlMenu(){
+    fermaFrutta();
+    fermaCorri();
+    chiudiPremio();
+    stato.gioco = "menu";
+    stato.stelle = 0;
+    aggiornaStelle();
+    mostra("#menu");
+  }
+
+  function avvia(gioco){
+    stato.gioco = gioco;
+    stato.stelle = 0;
+    chiudiPremio();
+    aggiornaStelle();
+    audio(); // sblocca l'audio al primo gesto
+    if(gioco === "lettere"){ mostra("#gioco-lettere"); nuovaLettera(); }
+    else if(gioco === "frutta"){ mostra("#gioco-frutta"); avviaFrutta(); }
+    else if(gioco === "conta"){ mostra("#gioco-conta"); nuovoConteggio(); }
+    else if(gioco === "magici"){ mostra("#gioco-magici"); parla("Premi un tasto!"); }
+    else if(gioco === "corri"){ mostra("#gioco-corri"); avviaCorri(); }
+  }
+
+  /* ========== GIOCO 1: LETTERE ========== */
+  var ALFABETO = [
+    ["A","Ape","🐝"], ["B","Barca","⛵"], ["C","Cane","🐶"], ["D","Dado","🎲"],
+    ["E","Elefante","🐘"], ["F","Fiore","🌻"], ["G","Gatto","🐱"], ["I","Isola","🏝️"],
+    ["L","Luna","🌙"], ["M","Mela","🍎"], ["N","Nuvola","☁️"], ["O","Orso","🐻"],
+    ["P","Pesce","🐟"], ["Q","Quadro","🖼️"], ["R","Rana","🐸"], ["S","Sole","☀️"],
+    ["T","Torta","🍰"], ["U","Uva","🍇"], ["V","Vulcano","🌋"], ["Z","Zebra","🦓"]
+  ];
+  var ultimaLettera = null;
+
+  function nuovaLettera(){
+    var scelta;
+    do { scelta = a_caso(ALFABETO); } while(ALFABETO.length > 1 && scelta[0] === ultimaLettera);
+    ultimaLettera = scelta[0];
+    stato.bersaglio = scelta[0];
+    $("#lettera-grande").textContent = scelta[0];
+    $("#lettera-emoji").textContent = scelta[2];
+    $("#lettera-parola").textContent = scelta[0] + " come " + scelta[1];
+    parla(scelta[0] + ", come " + scelta[1]);
+  }
+
+  function rispostaLettera(tasto){
+    var grande = $("#lettera-grande");
+    if(tasto === stato.bersaglio){
+      suonoOk();
+      grande.classList.remove("scossa");
+      grande.classList.add("salta");
+      coriandoli(35);
+      parla(a_caso(FRASI_BRAVO));
+      setTimeout(function(){ grande.classList.remove("salta"); }, 520);
+      if(!stellaVinta()) setTimeout(nuovaLettera, 1100);
+    }else{
+      suonoRiprova();
+      grande.classList.remove("salta");
+      grande.classList.add("scossa");
+      setTimeout(function(){ grande.classList.remove("scossa"); }, 420);
+    }
+  }
+
+  /* ========== GIOCO 2: RACCOGLI LA FRUTTA ========== */
+  var FRUTTI = ["🍓","🍎","🍌","🍇","🍊","🍐","🍒","🍉","🥝","🍍"];
+  var NOMI_FRUTTI = {"🍓":"fragola","🍎":"mela","🍌":"banana","🍇":"uva","🍊":"arancia",
+                     "🍐":"pera","🍒":"ciliegia","🍉":"anguria","🥝":"kiwi","🍍":"ananas"};
+  var VELOCITA = 6;
+
+  function areaCampo(){
+    var campo = $("#campo");
+    return { w: campo.clientWidth, h: campo.clientHeight };
+  }
+
+  function nuovoFrutto(){
+    var a = areaCampo();
+    var el = document.createElement("div");
+    el.className = "attore frutto";
+    var simbolo = a_caso(FRUTTI);
+    el.textContent = simbolo;
+    var x = tra(40, Math.max(60, a.w - 120));
+    var y = tra(90, Math.max(140, a.h - 140));
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.animationDelay = (Math.random()) + "s";
+    $("#campo").appendChild(el);
+    stato.frutti.push({el:el, x:x, y:y, simbolo:simbolo});
+  }
+
+  function avviaFrutta(){
+    fermaFrutta();
+    var a = areaCampo();
+    stato.eroe.x = a.w/2 - 38;
+    stato.eroe.y = a.h/2 - 38;
+    posizionaEroe();
+    for(var i=0;i<4;i++) nuovoFrutto();
+    parla("Raccogli la frutta con le frecce!");
+    stato.animazione = requestAnimationFrame(cicloFrutta);
+  }
+
+  function fermaFrutta(){
+    if(stato.animazione){ cancelAnimationFrame(stato.animazione); stato.animazione = null; }
+    for(var i=0;i<stato.frutti.length;i++) stato.frutti[i].el.remove();
+    stato.frutti = [];
+    stato.tastiPremuti = {};
+  }
+
+  function posizionaEroe(){
+    var e = $("#eroe");
+    e.style.left = stato.eroe.x + "px";
+    e.style.top = stato.eroe.y + "px";
+  }
+
+  function cicloFrutta(){
+    if(stato.gioco !== "frutta"){ stato.animazione = null; return; }
+    if(!stato.inPremio){
+      var a = areaCampo(), dx = 0, dy = 0, t = stato.tastiPremuti;
+      if(t["ArrowLeft"])  dx -= VELOCITA;
+      if(t["ArrowRight"]) dx += VELOCITA;
+      if(t["ArrowUp"])    dy -= VELOCITA;
+      if(t["ArrowDown"])  dy += VELOCITA;
+
+      if(dx || dy){
+        stato.eroe.x = Math.min(Math.max(stato.eroe.x + dx, 10), Math.max(10, a.w - 90));
+        stato.eroe.y = Math.min(Math.max(stato.eroe.y + dy, 70), Math.max(70, a.h - 110));
+        var eroe = $("#eroe");
+        if(dx < 0) eroe.style.transform = "scaleX(-1)";
+        else if(dx > 0) eroe.style.transform = "scaleX(1)";
+        posizionaEroe();
+        controllaRaccolta();
+      }
+    }
+    stato.animazione = requestAnimationFrame(cicloFrutta);
+  }
+
+  function controllaRaccolta(){
+    for(var i = stato.frutti.length - 1; i >= 0; i--){
+      var f = stato.frutti[i];
+      var dx = (f.x + 32) - (stato.eroe.x + 38);
+      var dy = (f.y + 32) - (stato.eroe.y + 38);
+      if(Math.sqrt(dx*dx + dy*dy) < 62){
+        f.el.remove();
+        stato.frutti.splice(i,1);
+        suonoOk();
+        coriandoli(25);
+        parla(a_caso(["Gnam!","Che buona!","Bravo!"]) + " " + (NOMI_FRUTTI[f.simbolo] || ""));
+        if(!stellaVinta()) nuovoFrutto();
+      }
+    }
+  }
+
+  /* ========== GIOCO 3: CONTA CON ME ========== */
+  var OGGETTI_CONTA = ["🐥","🎈","🐞","🌷","⭐","🍪","🐠","🚗","🦋","🐸"];
+  var ultimoNumero = null;
+
+  function nuovoConteggio(){
+    var n;
+    do { n = 1 + Math.floor(Math.random()*5); } while(n === ultimoNumero);
+    ultimoNumero = n;
+    stato.bersaglio = String(n);
+    var oggetto = a_caso(OGGETTI_CONTA);
+    var box = $("#conta-oggetti");
+    box.innerHTML = "";
+    for(var i=0;i<n;i++){
+      var s = document.createElement("span");
+      s.textContent = oggetto;
+      s.style.animationDelay = (i*0.12) + "s";
+      box.appendChild(s);
+    }
+    parla("Quanti sono?");
+  }
+
+  function rispostaConta(tasto){
+    var box = $("#conta-oggetti");
+    if(tasto === stato.bersaglio){
+      suonoOk();
+      coriandoli(35);
+      box.classList.remove("scossa");
+      parla("Sì! " + stato.bersaglio + ". " + a_caso(FRASI_BRAVO));
+      if(!stellaVinta()) setTimeout(nuovoConteggio, 1400);
+    }else{
+      suonoRiprova();
+      box.classList.add("scossa");
+      setTimeout(function(){ box.classList.remove("scossa"); }, 420);
+    }
+  }
+
+  /* ========== GIOCO 4: TASTI MAGICI ========== */
+  var MAGIE = ["🌈","⭐","🎈","🦄","🚀","🐙","🍭","🎃","🐳","🌻","🐝","🎁","🍩","🐧","🦖","🎸","🐢","🌟","🍕","🐨"];
+  var SCALA = [262,294,330,349,392,440,494,523,587,659];
+
+  function magia(){
+    var el = document.createElement("div");
+    el.className = "bolla";
+    el.textContent = a_caso(MAGIE);
+    el.style.left = tra(8, 82) + "vw";
+    el.style.top  = tra(20, 70) + "vh";
+    el.style.fontSize = tra(70, 150) + "px";
+    $("#gioco-magici").appendChild(el);
+    setTimeout(function(){ el.remove(); }, 1700);
+    nota(a_caso(SCALA), 0.3, "triangle", 0.16);
+  }
+
+  /* ========== GIOCO 5: CORRI E SALTA ========== */
+  var corri = {
+    animazione: null,
+    y: 0,          // spostamento verticale (0 = a terra, negativo = in alto)
+    vy: 0,         // velocità verticale
+    aTerra: true,
+    baseX: 0,      // posizione orizzontale del corridore
+    baseY: 0,      // coordinata "terra" in px
+    stelline: [],
+    nuvole: [],
+    tempoStella: 0,
+    tempoNuvola: 0,
+    passo: 0       // per l'animazione della corsa
+  };
+  var GRAVITA = 0.9, SPINTA_SALTO = 20;
+
+  function areaPista(){
+    var p = $("#pista");
+    return { w: p.clientWidth, h: p.clientHeight };
+  }
+
+  function avviaCorri(){
+    fermaCorri();
+    var a = areaPista();
+    corri.baseX = Math.max(40, a.w * 0.16);
+    corri.baseY = a.h * 0.78 - 78;   // sopra il terreno (alto 22%)
+    corri.y = 0; corri.vy = 0; corri.aTerra = true;
+    corri.stelline = []; corri.nuvole = [];
+    corri.tempoStella = 40; corri.tempoNuvola = 120; corri.passo = 0;
+    var c = $("#corridore");
+    c.style.left = corri.baseX + "px";
+    c.style.top = corri.baseY + "px";
+    c.textContent = "🏃";
+    parla("Salta con lo spazio per prendere le stelline!");
+    corri.animazione = requestAnimationFrame(cicloCorri);
+  }
+
+  function fermaCorri(){
+    if(corri.animazione){ cancelAnimationFrame(corri.animazione); corri.animazione = null; }
+    for(var i=0;i<corri.stelline.length;i++) corri.stelline[i].el.remove();
+    for(var j=0;j<corri.nuvole.length;j++) corri.nuvole[j].el.remove();
+    corri.stelline = []; corri.nuvole = [];
+  }
+
+  function salta(){
+    if(corri.aTerra){
+      corri.vy = -SPINTA_SALTO;
+      corri.aTerra = false;
+      nota(523,0.14,"square",0.12);
+      nota(784,0.14,"square",0.12,0.07);
+    }
+  }
+
+  function nuovaStellina(){
+    var a = areaPista();
+    var el = document.createElement("div");
+    el.className = "stellina";
+    el.textContent = "⭐";
+    // altezza a caso: alcune a terra, altre da saltare
+    var alta = Math.random() < 0.7;
+    var y = alta ? corri.baseY - tra(70, 210) : corri.baseY + tra(0, 6);
+    el.style.left = (a.w + 40) + "px";
+    el.style.top = y + "px";
+    $("#pista").appendChild(el);
+    corri.stelline.push({el:el, x:a.w+40, y:y});
+  }
+
+  function nuovaNuvola(){
+    var a = areaPista();
+    var el = document.createElement("div");
+    el.className = "nuvoletta";
+    el.textContent = a_caso(["☁️","🌤️","🎈","🦋"]);
+    var y = tra(a.h*0.06, a.h*0.32);
+    el.style.left = (a.w + 40) + "px";
+    el.style.top = y + "px";
+    $("#pista").appendChild(el);
+    corri.nuvole.push({el:el, x:a.w+40, y:y});
+  }
+
+  function cicloCorri(){
+    if(stato.gioco !== "corri"){ corri.animazione = null; return; }
+    var a = areaPista();
+
+    if(!stato.inPremio){
+      // salto del corridore
+      if(!corri.aTerra){
+        corri.vy += GRAVITA;
+        corri.y += corri.vy;
+        if(corri.y >= 0){ corri.y = 0; corri.vy = 0; corri.aTerra = true; }
+      }
+      // animazione corsa (dondolio quando è a terra)
+      corri.passo += 0.25;
+      var dondolio = corri.aTerra ? Math.sin(corri.passo)*4 : 0;
+      var c = $("#corridore");
+      c.style.top = (corri.baseY + corri.y) + "px";
+      c.style.transform = "translateY(" + dondolio + "px) scaleX(1)";
+
+      // genera stelline e nuvole
+      if(--corri.tempoStella <= 0){ nuovaStellina(); corri.tempoStella = Math.round(tra(55, 95)); }
+      if(--corri.tempoNuvola <= 0){ nuovaNuvola(); corri.tempoNuvola = Math.round(tra(140, 240)); }
+
+      // muovi nuvole (sfondo, più lente)
+      for(var n = corri.nuvole.length - 1; n >= 0; n--){
+        var nu = corri.nuvole[n];
+        nu.x -= 2.2; nu.el.style.left = nu.x + "px";
+        if(nu.x < -80){ nu.el.remove(); corri.nuvole.splice(n,1); }
+      }
+
+      // muovi stelline e controlla la raccolta
+      var hx = corri.baseX, hy = corri.baseY + corri.y;
+      for(var s = corri.stelline.length - 1; s >= 0; s--){
+        var st = corri.stelline[s];
+        st.x -= 7; st.el.style.left = st.x + "px";
+        var dx = (st.x + 28) - (hx + 39);
+        var dy = (st.y + 28) - (hy + 39);
+        if(Math.sqrt(dx*dx + dy*dy) < 66){
+          st.el.remove(); corri.stelline.splice(s,1);
+          suonoOk(); coriandoli(18);
+          parla(a_caso(["Presa!","Uno!","Evviva!","Bravo!"]));
+          if(stellaVinta()) return endCiclo();
+          continue;
+        }
+        if(st.x < -70){ st.el.remove(); corri.stelline.splice(s,1); }
+      }
+    }
+    return endCiclo();
+
+    function endCiclo(){ corri.animazione = requestAnimationFrame(cicloCorri); }
+  }
+
+  /* ========== TASTIERA ========== */
+  var FRECCE = {ArrowLeft:1, ArrowRight:1, ArrowUp:1, ArrowDown:1};
+
+  document.addEventListener("keydown", function(ev){
+    var k = ev.key;
+
+    if(FRECCE[k] || k === " " || k === "Spacebar") ev.preventDefault();
+
+    // ESC torna sempre al menu
+    if(k === "Escape"){ vaiAlMenu(); return; }
+
+    // interruttori suono / voce
+    if(k === "m" || k === "M"){
+      stato.suoni = !stato.suoni;
+      if(stato.suoni) nota(660,0.2,"triangle",0.18);
+      return;
+    }
+    if(k === "v" || k === "V"){
+      stato.voce = !stato.voce;
+      if(!stato.voce && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      else parla("Voce accesa");
+      return;
+    }
+
+    // schermata premio: un tasto qualsiasi continua
+    if(stato.inPremio){
+      chiudiPremio();
+      if(stato.gioco === "lettere") nuovaLettera();
+      else if(stato.gioco === "conta") nuovoConteggio();
+      else if(stato.gioco === "frutta"){ while(stato.frutti.length < 4) nuovoFrutto(); }
+      else if(stato.gioco === "corri"){ corri.tempoStella = 30; }
+      return;
+    }
+
+    if(stato.gioco === "menu"){
+      if(k === "1") avvia("lettere");
+      else if(k === "2") avvia("frutta");
+      else if(k === "3") avvia("conta");
+      else if(k === "4") avvia("magici");
+      else if(k === "5") avvia("corri");
+      return;
+    }
+
+    if(stato.gioco === "lettere"){
+      if(k.length === 1 && /[a-zA-Z]/.test(k)) rispostaLettera(k.toUpperCase());
+      return;
+    }
+
+    if(stato.gioco === "conta"){
+      if(k.length === 1 && /[0-9]/.test(k)) rispostaConta(k);
+      return;
+    }
+
+    if(stato.gioco === "frutta"){
+      if(FRECCE[k]) stato.tastiPremuti[k] = true;
+      return;
+    }
+
+    if(stato.gioco === "magici"){
+      if(ev.repeat) return;
+      magia();
+      return;
+    }
+
+    if(stato.gioco === "corri"){
+      if(ev.repeat) return;
+      if(k === " " || k === "Spacebar" || k === "ArrowUp") salta();
+      return;
+    }
+  });
+
+  document.addEventListener("keyup", function(ev){
+    if(FRECCE[ev.key]) stato.tastiPremuti[ev.key] = false;
+  });
+
+  // se la finestra perde il focus, il personaggio si ferma
+  window.addEventListener("blur", function(){ stato.tastiPremuti = {}; });
+
+  /* ========== MOUSE / TOCCO (per il menu e il premio) ========== */
+  var carte = document.querySelectorAll(".carta");
+  for(var i=0;i<carte.length;i++){
+    (function(carta){
+      carta.addEventListener("click", function(){ avvia(carta.getAttribute("data-gioco")); });
+      carta.addEventListener("keydown", function(ev){
+        if(ev.key === "Enter"){ avvia(carta.getAttribute("data-gioco")); }
+      });
+    })(carte[i]);
+  }
+  $("#premio").addEventListener("click", function(){
+    chiudiPremio();
+    if(stato.gioco === "lettere") nuovaLettera();
+    else if(stato.gioco === "conta") nuovoConteggio();
+    else if(stato.gioco === "frutta"){ while(stato.frutti.length < 4) nuovoFrutto(); }
+    else if(stato.gioco === "corri"){ corri.tempoStella = 30; }
+  });
+
+  // il campo si adatta se si ridimensiona la finestra
+  window.addEventListener("resize", function(){
+    if(stato.gioco === "frutta"){
+      var a = areaCampo();
+      stato.eroe.x = Math.min(stato.eroe.x, Math.max(10, a.w - 90));
+      stato.eroe.y = Math.min(stato.eroe.y, Math.max(70, a.h - 110));
+      posizionaEroe();
+    }else if(stato.gioco === "corri"){
+      var p = areaPista();
+      corri.baseX = Math.max(40, p.w * 0.16);
+      corri.baseY = p.h * 0.78 - 78;
+      var c = $("#corridore");
+      c.style.left = corri.baseX + "px";
+      if(corri.aTerra) c.style.top = corri.baseY + "px";
+    }
+  });
+
+  aggiornaStelle();
+})();
+</script>
+</body>
+</html>
