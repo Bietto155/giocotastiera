@@ -1,7 +1,7 @@
 # Collezione Tiger Electronics / GIG – LCD palmari
 
 Progetto di gestione di una collezione di giochi LCD vintage **Tiger Electronics** (in Italia importati e distribuiti da **GIG**), anni '80–'90.
-Stato aggiornato al **19/11/2026**.
+Stato aggiornato al **24/11/2026**.
 
 ---
 
@@ -45,13 +45,13 @@ La ricerca automatica settimanale (sabato) è stata **disattivata il 19/11/2026*
 
 ---
 
-## 3. Titoli cercati (focus) – 30
+## 3. Titoli cercati (focus) – 29
 
 **P1 (21)**
 Ninja · Ninja Fighter · Hi Rev Racer (formato da verificare) · Stock Car Racing / Super Speedway · Dinosaurs! · Rampage · Out Run (non F1) · Super Sprint (nel volantino GIG forse "Sprint Racing") · World Games · Marble Madness (volantino GIG: "Marble Maze") · WWF Superstars (solo palmare) · Ritorno al Futuro (solo entro 50 €) · Snake's Revenge · Vindicators · World Championship Wrestling · Tiger Racing (1991) · Pit-Fighter · Battletoads · Streets of Rage · Super Double Dragon (confermato palmare Tiger 1993) · Al Unser Jr. Turbo Racing (volantino GIG: "Turbo Racing")
 
-**P2 (9)**
-Jordan vs Bird · Police Academy · Beetlejuice · Kings of the Beach · Swamp Thing · Silver Surfer · Captain Planet · Home Alone 2 · Wayne's World
+**P2 (8)**
+Jordan vs Bird · Police Academy · Beetlejuice · Kings of the Beach · Swamp Thing · Silver Surfer · Home Alone 2 · Wayne's World
 
 **Esclusi dopo verifica**
 - Space Harrier II: non risulta come palmare (né su Handheld Museum); il pezzo posseduto è Space Harrier.
@@ -67,11 +67,10 @@ Space Invaders palmare · Mr. Bullfrog · Playmaker / Playmaker Football · 2 in
 
 ## 4. Acquisti recenti (ottobre–novembre 2026)
 
-### In arrivo (10)
+### In arrivo (9)
 | Titolo | Sito | Prezzo |
 |---|---|---|
 | Altered Beast | Vinted | 35 € |
-| The Incredible Crash Dummies (Gli Sbullonati) | Vinted | 35 € |
 | Power Rangers | Vinted | 25 € |
 | Soccer | Vinted | 17 € |
 | James Bond Jr. | eBay | 30 € |
@@ -87,7 +86,7 @@ Space Invaders palmare · Mr. Bullfrog · Playmaker / Playmaker Football · 2 in
 - Kings of the Beach (Vinted): non funzionante, reso richiesto.
 
 ### Arrivati di recente (tutti funzionanti salvo nota)
-Jurassic Park, Hang-On, Space Jam, Golden Axe, Double Dragon, After Burner (tasti puliti), Terminator, Strider (tasti puliti con alcol), Addams Family, Rocketeer (Subito), Star Trek TNG, Guerrilla War, Gauntlet, Virtua Fighter, Tecmo Bowl, Hook, Batman Forever, Street Fighter 2010, Flash, Speed Boat, Dick Tracy, Monster Jam (Shaq Attaq), Paperboy 2, Hard Drivin', Michael Jordan in Flight, American Gladiators.
+The Incredible Crash Dummies (24/11), Captain Planet (24/11, dati acquisto da registrare), Jurassic Park, Hang-On, Space Jam, Golden Axe, Double Dragon, After Burner (tasti puliti), Terminator, Strider (tasti puliti con alcol), Addams Family, Rocketeer (Subito), Star Trek TNG, Guerrilla War, Gauntlet, Virtua Fighter, Tecmo Bowl, Hook, Batman Forever, Street Fighter 2010, Flash, Speed Boat, Dick Tracy, Monster Jam (Shaq Attaq), Paperboy 2, Hard Drivin', Michael Jordan in Flight, American Gladiators.
 Mega Man 2: tenuto a 10 € con contatti LCD ossidati (schermo parziale).
 
 ---
