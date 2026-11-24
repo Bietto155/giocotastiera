@@ -67,16 +67,14 @@ Space Invaders palmare · Mr. Bullfrog · Playmaker / Playmaker Football · 2 in
 
 ## 4. Acquisti recenti (ottobre–novembre 2026)
 
-### In arrivo (9)
+### In arrivo (7)
 | Titolo | Sito | Prezzo |
 |---|---|---|
 | Altered Beast | Vinted | 35 € |
-| Power Rangers | Vinted | 25 € |
 | Soccer | Vinted | 17 € |
 | James Bond Jr. | eBay | 30 € |
 | Spider-Man (1991, Hobgoblin) | Vinted | 30 € |
 | Batman (1989) | eBay | 23 € |
-| Tennis | Vinted | 20 € |
 | Batman Returns (Batman, il ritorno) | Vinted | 25 € |
 | X-Men (Wolverine/Magneto) – secondo acquisto | Vinted | 26 € |
 
@@ -86,7 +84,7 @@ Space Invaders palmare · Mr. Bullfrog · Playmaker / Playmaker Football · 2 in
 - Kings of the Beach (Vinted): non funzionante, reso richiesto.
 
 ### Arrivati di recente (tutti funzionanti salvo nota)
-The Incredible Crash Dummies (24/11), Captain Planet (24/11, dati acquisto da registrare), Jurassic Park, Hang-On, Space Jam, Golden Axe, Double Dragon, After Burner (tasti puliti), Terminator, Strider (tasti puliti con alcol), Addams Family, Rocketeer (Subito), Star Trek TNG, Guerrilla War, Gauntlet, Virtua Fighter, Tecmo Bowl, Hook, Batman Forever, Street Fighter 2010, Flash, Speed Boat, Dick Tracy, Monster Jam (Shaq Attaq), Paperboy 2, Hard Drivin', Michael Jordan in Flight, American Gladiators.
+Power Rangers (24/11), Tennis (24/11), The Incredible Crash Dummies (24/11), Captain Planet (24/11, dati acquisto da registrare), Jurassic Park, Hang-On, Space Jam, Golden Axe, Double Dragon, After Burner (tasti puliti), Terminator, Strider (tasti puliti con alcol), Addams Family, Rocketeer (Subito), Star Trek TNG, Guerrilla War, Gauntlet, Virtua Fighter, Tecmo Bowl, Hook, Batman Forever, Street Fighter 2010, Flash, Speed Boat, Dick Tracy, Monster Jam (Shaq Attaq), Paperboy 2, Hard Drivin', Michael Jordan in Flight, American Gladiators.
 Mega Man 2: tenuto a 10 € con contatti LCD ossidati (schermo parziale).
 
 ---
