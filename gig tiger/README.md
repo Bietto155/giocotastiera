@@ -67,9 +67,10 @@ Space Invaders palmare · Mr. Bullfrog · Playmaker / Playmaker Football · 2 in
 
 ## 4. Acquisti recenti (ottobre–novembre 2026)
 
-### In arrivo (7)
+### In arrivo (8)
 | Titolo | Sito | Prezzo |
 |---|---|---|
+| Basketball | Vinted | 20 € |
 | Altered Beast | Vinted | 35 € |
 | Soccer | Vinted | 17 € |
 | James Bond Jr. | eBay | 30 € |
